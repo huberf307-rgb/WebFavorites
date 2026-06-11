@@ -668,6 +668,63 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    /* ─── Import Confirmation Modal ────────────────────────────────────── */
+    #import-confirm-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: none;
+    }
+    #import-confirm-overlay.visible {
+      display: block;
+    }
+    #import-confirm-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 310;
+      width: 340px;
+      background: rgba(20, 20, 18, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      display: none;
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+    }
+    #import-confirm-container.visible {
+      display: block;
+      animation: importModalIn var(--transition-slow) forwards;
+    }
+    @keyframes importModalIn {
+      from { opacity: 0; transform: translate(-50%, -46%) scale(0.96); }
+      to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    button.settings-popup-item {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+    .settings-data-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .settings-action-icon {
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+    }
+
     /* Minimalist Overrides */
     .header-logo,
     .header-title,
@@ -749,6 +806,21 @@
           <div class="bg-image-preview bg-option" data-bg="url('backgrounds/5_dreamy_clouds.png')" style="background-image: url('backgrounds/5_dreamy_clouds.png');">
             <span class="bg-image-title">Traumwolken</span>
           </div>
+        </div>
+
+        <div class="settings-popup-divider"></div>
+        <div class="settings-popup-label">Daten verwalten</div>
+        <div class="settings-data-actions">
+          <button class="settings-popup-item" id="btn-export-file">
+            <span class="settings-action-icon">📥</span> Backup herunterladen
+          </button>
+          <button class="settings-popup-item" id="btn-copy-link">
+            <span class="settings-action-icon">🔗</span> Teilen-Link kopieren
+          </button>
+          <button class="settings-popup-item" id="btn-import-file">
+            <span class="settings-action-icon">📤</span> Backup einspielen
+          </button>
+          <input type="file" id="file-import-input" accept=".json" style="display: none;" />
         </div>
       </div>
     </div>
@@ -840,6 +912,21 @@
   <span id="toast-icon">✓</span>
   <span id="toast-msg"></span>
   <button id="toast-undo" style="display:none">Rückgängig</button>
+</div>
+
+<!-- ─── Import Confirmation Modal ────────────────────────────────────── -->
+<div id="import-confirm-overlay"></div>
+<div id="import-confirm-container" role="dialog" aria-modal="true" aria-label="Import bestätigen">
+  <div class="form-title">Daten importieren</div>
+  <div class="import-confirm-body" style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px;">
+    Möchtest du die importierten Lesezeichen und Einstellungen übernehmen? 
+    <br><br>
+    <strong style="color: var(--danger);">Achtung:</strong> Deine aktuellen Daten werden dabei überschrieben.
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-secondary" id="import-cancel">Abbrechen</button>
+    <button class="btn btn-primary" id="import-confirm">Importieren</button>
+  </div>
 </div>
 
 <script>
@@ -1371,9 +1458,175 @@ bgOptions.forEach(opt => {
   });
 });
 
+// ══════════════════════════════════════════════════════════════════════
+// DATA IMPORT & EXPORT
+// ══════════════════════════════════════════════════════════════════════
+
+let pendingImportData = null;
+
+const btnExportFile      = document.getElementById('btn-export-file');
+const btnCopyLink        = document.getElementById('btn-copy-link');
+const btnImportFile      = document.getElementById('btn-import-file');
+const fileImportInput    = document.getElementById('file-import-input');
+const importOverlay      = document.getElementById('import-confirm-overlay');
+const importContainer    = document.getElementById('import-confirm-container');
+const importCancel       = document.getElementById('import-cancel');
+const importConfirmBtn   = document.getElementById('import-confirm');
+
+function exportToFile() {
+  const data = {
+    version: 1,
+    bookmarks: bookmarks,
+    background: localStorage.getItem('webfavs_bg') || 'none'
+  };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `webfavs_backup_${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("Backup heruntergeladen!", false);
+}
+
+function copyShareLink() {
+  const data = {
+    version: 1,
+    bookmarks: bookmarks,
+    background: localStorage.getItem('webfavs_bg') || 'none'
+  };
+  const json = JSON.stringify(data);
+  const base64 = btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+    return String.fromCharCode(parseInt(p1, 16));
+  }));
+  
+  const shareUrl = `${window.location.origin}${window.location.pathname}?import=${base64}`;
+  
+  navigator.clipboard.writeText(shareUrl)
+    .then(() => {
+      showToast("Teilen-Link kopiert!", false);
+    })
+    .catch(() => {
+      showToast("Kopieren failed", false);
+    });
+}
+
+function toggleImportConfirm(open, data = null) {
+  pendingImportData = open ? data : null;
+  importOverlay.classList.toggle('visible', open);
+  importContainer.classList.toggle('visible', open);
+}
+
+function safeAtob(str) {
+  try {
+    return decodeURIComponent(Array.prototype.map.call(atob(str), (c) => {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  } catch (e) {
+    console.error("safeAtob decoding failed:", e);
+    return null;
+  }
+}
+
+function processImport(data) {
+  if (!data || !Array.isArray(data.bookmarks)) {
+    showToast("Ungültiges Backup-Format!", false);
+    return;
+  }
+  
+  const importedBookmarks = data.bookmarks.map(bm => {
+    return {
+      id: bm.id || uid(),
+      name: bm.name || 'Lesezeichen',
+      url: bm.url || 'https://google.com',
+      favorite: !!bm.favorite
+    };
+  });
+  
+  bookmarks = importedBookmarks;
+  saveBookmarks();
+  
+  if (data.background && data.background !== 'none') {
+    localStorage.setItem('webfavs_bg', data.background);
+  } else {
+    localStorage.removeItem('webfavs_bg');
+  }
+  
+  toggleImportConfirm(false);
+  
+  if (window.location.search.includes('import=')) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+  
+  location.reload();
+}
+
+function checkUrlImport() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const importParam = urlParams.get('import');
+  if (importParam) {
+    const jsonStr = safeAtob(importParam);
+    if (jsonStr) {
+      try {
+        const data = JSON.parse(jsonStr);
+        if (data && Array.isArray(data.bookmarks)) {
+          setTimeout(() => {
+            toggleImportConfirm(true, data);
+          }, 300);
+        }
+      } catch (e) {
+        console.error("JSON parsing of url import failed", e);
+        showToast("Ungültiger Import-Link", false);
+      }
+    } else {
+      showToast("Ungültiger Import-Link", false);
+    }
+  }
+}
+
+btnExportFile.addEventListener('click', exportToFile);
+btnCopyLink.addEventListener('click', copyShareLink);
+btnImportFile.addEventListener('click', () => fileImportInput.click());
+
+fileImportInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    try {
+      const data = JSON.parse(evt.target.result);
+      if (data && Array.isArray(data.bookmarks)) {
+        toggleImportConfirm(true, data);
+      } else {
+        showToast("Ungültiges Backup-Format!", false);
+      }
+    } catch (err) {
+      showToast("Fehler beim Lesen der Datei", false);
+    }
+    fileImportInput.value = '';
+  };
+  reader.readAsText(file);
+});
+
+importCancel.addEventListener('click', () => {
+  toggleImportConfirm(false);
+  if (window.location.search.includes('import=')) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+});
+
+importConfirmBtn.addEventListener('click', () => {
+  if (pendingImportData) {
+    processImport(pendingImportData);
+  }
+});
+
 loadBackground();
 loadBookmarks();
 renderAll();
+checkUrlImport();
 </script>
 </body>
 </html>
