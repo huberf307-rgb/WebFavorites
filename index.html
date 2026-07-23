@@ -829,14 +829,49 @@
       text-align: center; padding: 16px 8px;
     }
     .cat-row {
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 11px;
       padding: 9px 12px; border-radius: 12px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: background var(--transition), border-color var(--transition);
     }
-    .cat-row-check {
-      width: 17px; height: 17px; flex-shrink: 0;
-      accent-color: var(--accent); cursor: pointer;
+    /* Clickable toggle row (assign mode) */
+    .cat-row-toggle { cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+    .cat-row-toggle:hover { background: rgba(255, 255, 255, 0.07); }
+    .cat-row-toggle:focus-visible { outline: none; border-color: var(--glass-border-strong); }
+    .cat-row-toggle.selected {
+      background: var(--accent-soft);
+      border-color: var(--border-accent);
+    }
+    /* Custom animated check box */
+    .cat-check {
+      width: 23px; height: 23px; flex-shrink: 0;
+      border-radius: 7px;
+      border: 2px solid var(--text-muted);
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .cat-check svg {
+      width: 14px; height: 14px;
+      fill: none; stroke: #fff; stroke-width: 3.2;
+      stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 26; stroke-dashoffset: 26;
+      transition: stroke-dashoffset 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    .cat-row-toggle.selected .cat-check {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-color: transparent;
+      animation: checkPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .cat-row-toggle.selected .cat-check svg {
+      stroke-dashoffset: 0;
+      transition-delay: 0.06s;
+    }
+    @keyframes checkPop {
+      0%   { transform: scale(0.7); }
+      55%  { transform: scale(1.15); }
+      100% { transform: scale(1); }
     }
     .cat-row-name {
       flex: 1; font-size: 0.85rem; color: var(--text-primary);
@@ -1817,16 +1852,30 @@ function renderCatModalList() {
     row.className = 'cat-row';
 
     if (catModalMode === 'assign') {
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.className = 'cat-row-check';
-      cb.checked = !!(bm && Array.isArray(bm.categories) && bm.categories.includes(cat.id));
-      cb.addEventListener('change', () => {
+      const checked = !!(bm && Array.isArray(bm.categories) && bm.categories.includes(cat.id));
+      row.classList.add('cat-row-toggle');
+      if (checked) row.classList.add('selected');
+      row.setAttribute('role', 'checkbox');
+      row.setAttribute('aria-checked', checked ? 'true' : 'false');
+      row.tabIndex = 0;
+
+      const check = document.createElement('span');
+      check.className = 'cat-check';
+      check.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4 4L19 7"/></svg>';
+      row.appendChild(check);
+
+      const toggle = () => {
         toggleBookmarkCategory(catModalBmId, cat.id);
+        const nowChecked = !!(bm && bm.categories.includes(cat.id));
+        row.classList.toggle('selected', nowChecked);
+        row.setAttribute('aria-checked', nowChecked ? 'true' : 'false');
         renderLeftPanel();
         renderFavorites();
+      };
+      row.addEventListener('click', toggle);
+      row.addEventListener('keydown', e => {
+        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); }
       });
-      row.appendChild(cb);
     }
 
     const name = document.createElement('span');
@@ -1838,7 +1887,9 @@ function renderCatModalList() {
     del.className = 'cat-row-del';
     del.textContent = '✕';
     del.title = 'Kategorie löschen';
-    del.addEventListener('click', () => {
+    del.setAttribute('aria-label', 'Kategorie löschen');
+    del.addEventListener('click', (e) => {
+      e.stopPropagation();
       deleteCategory(cat.id);
       renderCatModalList();
     });
