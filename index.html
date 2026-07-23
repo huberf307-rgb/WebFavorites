@@ -43,14 +43,9 @@
       --shadow-glow:    0 0 16px rgba(79, 70, 229, 0.15);
       --left-w:         252px;
 
-      /* Liquid Glass */
-      --glass-fill:          linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
-      --glass-fill-hover:    linear-gradient(180deg, rgba(255,255,255,0.26), rgba(255,255,255,0.12));
-      --glass-fill-strong:   linear-gradient(180deg, rgba(255,255,255,0.30), rgba(255,255,255,0.14));
+      /* Neutral glass (subtle hovers & borders — no orange glow) */
       --glass-border:        rgba(255,255,255,0.28);
       --glass-border-strong: rgba(255,255,255,0.42);
-      --glass-highlight:     inset 0 1px 0 rgba(255,255,255,0.45);
-      --glass-shadow:        0 8px 24px rgba(0,0,0,0.22);
       --glass-soft:          rgba(255,255,255,0.10);
       --glass-soft-hover:    rgba(255,255,255,0.15);
     }
@@ -344,7 +339,7 @@
       font-family: 'Inter', sans-serif; font-size: 0.875rem; padding: 9px 12px; outline: none;
       transition: all var(--transition);
     }
-    .form-group input:focus { border-color: var(--glass-border-strong); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.10); }
+    .form-group input:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.08); }
     .form-group input::placeholder { color: var(--text-muted); }
     .form-actions { display: flex; gap: 8px; margin-top: 16px; }
     .btn {
@@ -353,17 +348,12 @@
       transition: all var(--transition);
     }
     .btn-primary {
-      background: var(--glass-fill-strong);
-      color: #fff; font-weight: 600;
-      border: 1px solid var(--glass-border-strong);
-      box-shadow: var(--glass-highlight), 0 2px 8px rgba(0, 0, 0, 0.18);
-      backdrop-filter: blur(10px) saturate(160%);
-      -webkit-backdrop-filter: blur(10px) saturate(160%);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; border: 1px solid rgba(255, 255, 255, 0.15);
     }
     .btn-primary:hover {
-      background: var(--glass-fill-hover);
       transform: translateY(-1px);
-      box-shadow: var(--glass-highlight), var(--glass-shadow);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
     }
     .btn-secondary {
       background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border: 1px solid rgba(255, 255, 255, 0.08);
@@ -785,13 +775,11 @@
       color: var(--text-primary);
     }
     .cat-pill.active {
-      background: var(--glass-fill-strong);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
       color: #fff;
       font-weight: 600;
-      border-color: var(--glass-border-strong);
-      box-shadow: var(--glass-highlight), 0 2px 10px rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(10px) saturate(180%);
-      -webkit-backdrop-filter: blur(10px) saturate(180%);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
     .cat-pill.cat-add {
       font-size: 1.05rem;
@@ -874,8 +862,8 @@
       transition: all var(--transition);
     }
     .cat-new-row input:focus {
-      border-color: var(--glass-border-strong); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.10);
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.08);
     }
     .cat-new-row input::placeholder { color: var(--text-muted); }
     .cat-new-add {
@@ -895,8 +883,8 @@
       transition: all var(--transition); white-space: nowrap;
     }
     .form-cat-chip.selected {
-      background: var(--glass-fill-strong); border-color: var(--glass-border-strong);
-      color: #fff; box-shadow: var(--glass-highlight);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-color: rgba(255, 255, 255, 0.15); color: #fff;
     }
 
     /* ─── Settings popup: tap-to-open (mobile) ───────────────────────── */
@@ -943,63 +931,91 @@
 
     /* ─── Responsive: Mobile ─────────────────────────────────────────── */
     @media (max-width: 760px) {
-      body { height: auto; min-height: 100dvh; overflow-y: auto; overflow-x: hidden; }
+      /* Fixed viewport — each column scrolls on its own, the page does not */
+      body { height: 100dvh; overflow: hidden; }
 
       #app-header { position: fixed; padding: 10px 12px 6px; }
       #category-bar {
-        max-width: calc(100vw - 20px);
+        max-width: calc(100vw - 96px);
         top: 8px;
       }
       .cat-pill { font-size: 0.75rem; padding: 6px 12px; }
 
+      /* Two fixed columns: apps list (left) + favorites strip (right) */
       #main-layout {
-        flex-direction: column;
-        overflow: visible;
-        padding: 62px 12px 28px;
-        gap: 18px;
-      }
-      #left-panel, #right-panel {
-        width: 100%;
-        overflow: visible;
-      }
-      /* Favorites first, searchable app list below */
-      #right-panel { order: 1; }
-      #left-panel  { order: 2; }
-      #left-panel::before { display: none; }
-
-      #fav-scroll { overflow: visible; }
-      #fav-grid {
-        margin: 0 auto;
-        padding: 8px 4px 4px;
-        gap: 14px;
-        max-width: 100%;
+        flex-direction: row;
+        align-items: stretch;
+        overflow: hidden;
+        padding: 58px 10px 10px;
+        gap: 10px;
       }
 
+      /* Apps list: gray container of CONSTANT size, scrolls internally */
       #left-panel {
+        order: 1;
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto;
         background: rgba(0, 0, 0, 0.28);
         border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 20px;
-        padding-bottom: 6px;
+        overflow: hidden;
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
       }
-      #alpha-book-scroll { overflow: visible; max-height: none; }
+      #left-panel::before { display: none; }
+      #alpha-book-scroll { overflow-y: auto; }
+
+      /* Favorites: vertical scrolling column pinned to the right */
+      #right-panel {
+        order: 2;
+        flex: 0 0 auto;
+        width: 88px;
+        overflow: hidden;
+      }
+      #fav-scroll { overflow: hidden; }
+      #fav-grid {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        margin: 0;
+        padding: 2px 0 84px;   /* bottom space so last icon clears the static + */
+        max-width: none;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+      }
+      .icon-card { width: 76px; padding: 14px 8px 12px; }
+
+      /* Static add button — always reachable, does not scroll away */
+      #add-btn {
+        position: fixed;
+        right: 14px;
+        bottom: 14px;
+        width: 60px;
+        height: 60px;
+        font-size: 26px;
+        z-index: 120;
+        flex-shrink: 0;
+      }
 
       #add-form-container {
         width: min(340px, calc(100vw - 20px));
         right: 10px; left: auto; top: 58px;
       }
       .settings-popup {
-        min-width: min(320px, calc(100vw - 20px));
+        min-width: min(280px, calc(100vw - 20px));
         max-width: calc(100vw - 20px);
         right: -6px;
       }
     }
 
     @media (max-width: 420px) {
-      #fav-grid { gap: 10px; }
-      .icon-card { width: 84px; padding: 14px 8px 12px; }
-      #add-btn { width: 60px; height: 60px; font-size: 26px; }
+      #right-panel { width: 80px; }
+      .icon-card { width: 70px; padding: 12px 6px 10px; }
+      #add-btn { width: 54px; height: 54px; font-size: 24px; }
     }
   </style>
 </head>
