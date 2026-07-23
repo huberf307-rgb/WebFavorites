@@ -42,6 +42,17 @@
       --shadow-card:    0 4px 20px rgba(0, 0, 0, 0.05);
       --shadow-glow:    0 0 16px rgba(79, 70, 229, 0.15);
       --left-w:         252px;
+
+      /* Liquid Glass */
+      --glass-fill:          linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
+      --glass-fill-hover:    linear-gradient(180deg, rgba(255,255,255,0.26), rgba(255,255,255,0.12));
+      --glass-fill-strong:   linear-gradient(180deg, rgba(255,255,255,0.30), rgba(255,255,255,0.14));
+      --glass-border:        rgba(255,255,255,0.28);
+      --glass-border-strong: rgba(255,255,255,0.42);
+      --glass-highlight:     inset 0 1px 0 rgba(255,255,255,0.45);
+      --glass-shadow:        0 8px 24px rgba(0,0,0,0.22);
+      --glass-soft:          rgba(255,255,255,0.10);
+      --glass-soft-hover:    rgba(255,255,255,0.15);
     }
 
     [data-theme="dark"] {
@@ -157,8 +168,8 @@
       user-select: none;
     }
     .settings-popup-item:hover {
-      background: var(--accent-soft);
-      color: var(--accent);
+      background: var(--glass-soft-hover);
+      color: var(--text-primary);
     }
     .settings-popup-divider {
       height: 1px;
@@ -213,7 +224,7 @@
     }
     .bg-image-preview:hover {
       transform: scale(1.03);
-      border-color: var(--accent);
+      border-color: var(--glass-border-strong);
     }
     .bg-image-title {
       width: 100%;
@@ -333,7 +344,7 @@
       font-family: 'Inter', sans-serif; font-size: 0.875rem; padding: 9px 12px; outline: none;
       transition: all var(--transition);
     }
-    .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-soft); background: rgba(255, 255, 255, 0.08); }
+    .form-group input:focus { border-color: var(--glass-border-strong); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.10); }
     .form-group input::placeholder { color: var(--text-muted); }
     .form-actions { display: flex; gap: 8px; margin-top: 16px; }
     .btn {
@@ -342,10 +353,18 @@
       transition: all var(--transition);
     }
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff; border: 1px solid rgba(255, 255, 255, 0.15);
+      background: var(--glass-fill-strong);
+      color: #fff; font-weight: 600;
+      border: 1px solid var(--glass-border-strong);
+      box-shadow: var(--glass-highlight), 0 2px 8px rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(10px) saturate(160%);
+      -webkit-backdrop-filter: blur(10px) saturate(160%);
     }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px var(--accent-glow); }
+    .btn-primary:hover {
+      background: var(--glass-fill-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--glass-highlight), var(--glass-shadow);
+    }
     .btn-secondary {
       background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border: 1px solid rgba(255, 255, 255, 0.08);
     }
@@ -542,7 +561,7 @@
     }
     .icon-card.dragging {
       opacity: 0.4;
-      border: 1px dashed var(--accent);
+      border: 1px dashed var(--glass-border-strong);
       transform: scale(0.95);
       box-shadow: none;
     }
@@ -590,7 +609,7 @@
     #ctx-menu {
       position: fixed; z-index: 950;
       background: var(--bg-card);
-      border: 1px solid var(--border-accent);
+      border: 1px solid var(--glass-border);
       border-radius: var(--radius-md);
       padding: 6px;
       min-width: 200px;
@@ -630,16 +649,16 @@
       transition: background var(--transition), color var(--transition);
     }
     .ctx-item .ctx-icon { font-size: 14px; flex-shrink: 0; width: 18px; text-align: center; }
-    .ctx-item:hover { background: var(--accent-soft); color: var(--accent); }
-    .ctx-item.fav-add:hover  { background: var(--star-soft); color: var(--star); }
-    .ctx-item.ctx-open:hover { background: var(--accent-soft); color: var(--accent); }
+    .ctx-item:hover { background: var(--glass-soft); color: var(--text-primary); }
+    .ctx-item.fav-add:hover  { background: var(--glass-soft); color: var(--text-primary); }
+    .ctx-item.ctx-open:hover { background: var(--glass-soft); color: var(--text-primary); }
     .ctx-item.ctx-danger:hover { background: var(--danger-soft); color: var(--danger); }
 
     /* ─── Toast ──────────────────────────────────────────────────────── */
     #toast {
       position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px);
       z-index: 500;
-      background: var(--bg-card); border: 1px solid var(--border-accent);
+      background: var(--bg-card); border: 1px solid var(--glass-border);
       border-radius: var(--radius-md); padding: 10px 18px;
       display: flex; align-items: center; gap: 10px;
       font-size: 0.8rem; color: var(--text-primary);
@@ -651,12 +670,12 @@
       opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto;
     }
     #toast-undo {
-      margin-left: 4px; background: var(--accent-soft); border: 1px solid var(--border-accent);
-      border-radius: 4px; color: var(--accent); font-size: 0.75rem; font-weight: 600;
+      margin-left: 4px; background: var(--glass-soft); border: 1px solid var(--glass-border);
+      border-radius: 4px; color: var(--text-primary); font-size: 0.75rem; font-weight: 600;
       padding: 3px 9px; cursor: pointer; transition: background var(--transition);
       font-family: 'Inter', sans-serif;
     }
-    #toast-undo:hover { background: rgba(99,130,255,0.25); }
+    #toast-undo:hover { background: var(--glass-soft-hover); }
 
     /* ─── Animations ─────────────────────────────────────────────────── */
     @keyframes cardIn {
@@ -725,6 +744,166 @@
       width: 18px;
     }
 
+    /* ─── Category Bar (top center) ──────────────────────────────────── */
+    #category-bar {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: min(64vw, 720px);
+      padding: 6px;
+      overflow-x: auto;
+      background: rgba(20, 20, 18, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      z-index: 90;
+      pointer-events: auto;
+    }
+    #category-bar::-webkit-scrollbar { display: none; }
+    .cat-pill {
+      flex-shrink: 0;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--transition);
+    }
+    .cat-pill:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+    }
+    .cat-pill.active {
+      background: var(--glass-fill-strong);
+      color: #fff;
+      font-weight: 600;
+      border-color: var(--glass-border-strong);
+      box-shadow: var(--glass-highlight), 0 2px 10px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px) saturate(180%);
+      -webkit-backdrop-filter: blur(10px) saturate(180%);
+    }
+    .cat-pill.cat-add {
+      font-size: 1.05rem;
+      font-weight: 400;
+      line-height: 1;
+      padding: 5px 13px;
+      color: var(--text-muted);
+    }
+    .cat-pill.cat-add:hover { color: var(--text-primary); }
+
+    /* ─── Category Modal ─────────────────────────────────────────────── */
+    #cat-modal-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      display: none;
+    }
+    #cat-modal-overlay.visible { display: block; }
+    #cat-modal {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 310;
+      width: min(360px, calc(100vw - 24px));
+      background: rgba(20, 20, 18, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      display: none;
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+    }
+    #cat-modal.visible {
+      display: block;
+      animation: importModalIn var(--transition-slow) forwards;
+    }
+    #cat-modal-bmname {
+      font-size: 0.78rem; font-weight: 600; color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .cat-modal-list {
+      display: flex; flex-direction: column; gap: 5px;
+      max-height: 42vh; overflow-y: auto; margin-bottom: 6px;
+    }
+    .cat-empty {
+      font-size: 0.78rem; color: var(--text-muted);
+      text-align: center; padding: 16px 8px;
+    }
+    .cat-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .cat-row-check {
+      width: 17px; height: 17px; flex-shrink: 0;
+      accent-color: var(--accent); cursor: pointer;
+    }
+    .cat-row-name {
+      flex: 1; font-size: 0.85rem; color: var(--text-primary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cat-row-del {
+      background: none; border: none; color: var(--text-muted);
+      cursor: pointer; font-size: 13px; padding: 4px 6px;
+      border-radius: 8px; flex-shrink: 0; line-height: 1;
+      transition: background var(--transition), color var(--transition);
+    }
+    .cat-row-del:hover { color: var(--danger); background: var(--danger-soft); }
+    .cat-new-row {
+      display: flex; gap: 8px; margin-top: 10px;
+    }
+    .cat-new-row input {
+      flex: 1; min-width: 0;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px; color: var(--text-primary);
+      font-family: 'Inter', sans-serif; font-size: 0.85rem;
+      padding: 9px 12px; outline: none;
+      transition: all var(--transition);
+    }
+    .cat-new-row input:focus {
+      border-color: var(--glass-border-strong); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.10);
+    }
+    .cat-new-row input::placeholder { color: var(--text-muted); }
+    .cat-new-add {
+      flex: 0 0 auto; width: auto; padding: 9px 16px;
+    }
+
+    /* ─── Category chips inside add form ─────────────────────────────── */
+    .form-cat-list {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      max-height: 120px; overflow-y: auto;
+    }
+    .form-cat-chip {
+      padding: 5px 12px; border-radius: 999px; font-size: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary); cursor: pointer; user-select: none;
+      transition: all var(--transition); white-space: nowrap;
+    }
+    .form-cat-chip.selected {
+      background: var(--glass-fill-strong); border-color: var(--glass-border-strong);
+      color: #fff; box-shadow: var(--glass-highlight);
+    }
+
+    /* ─── Settings popup: tap-to-open (mobile) ───────────────────────── */
+    .settings-menu-container.open .settings-popup {
+      opacity: 1; visibility: visible; transform: translateY(0);
+    }
+
     /* Minimalist Overrides */
     .header-logo,
     .header-title,
@@ -740,12 +919,95 @@
     #toast-icon {
       display: none !important;
     }
+
+    /* ─── Responsive: Large screens ──────────────────────────────────── */
+    @media (min-width: 1600px) {
+      html { font-size: 17px; }
+      :root { --left-w: 320px; }
+      #main-layout { padding: 24px 40px; gap: 28px; }
+      #fav-grid { max-width: 860px; gap: 20px; }
+      .icon-card { width: 108px; }
+      .icon-favicon-wrap { width: 56px; height: 56px; }
+      .icon-favicon-wrap img { width: 32px; height: 32px; }
+    }
+    @media (min-width: 2100px) {
+      #main-layout { max-width: 2000px; margin: 0 auto; width: 100%; }
+      #left-panel::before { width: calc(100% + 50px); }
+    }
+
+    /* ─── Responsive: Tablet ─────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      :root { --left-w: 220px; }
+      #category-bar { max-width: min(70vw, 560px); }
+    }
+
+    /* ─── Responsive: Mobile ─────────────────────────────────────────── */
+    @media (max-width: 760px) {
+      body { height: auto; min-height: 100dvh; overflow-y: auto; overflow-x: hidden; }
+
+      #app-header { position: fixed; padding: 10px 12px 6px; }
+      #category-bar {
+        max-width: calc(100vw - 20px);
+        top: 8px;
+      }
+      .cat-pill { font-size: 0.75rem; padding: 6px 12px; }
+
+      #main-layout {
+        flex-direction: column;
+        overflow: visible;
+        padding: 62px 12px 28px;
+        gap: 18px;
+      }
+      #left-panel, #right-panel {
+        width: 100%;
+        overflow: visible;
+      }
+      /* Favorites first, searchable app list below */
+      #right-panel { order: 1; }
+      #left-panel  { order: 2; }
+      #left-panel::before { display: none; }
+
+      #fav-scroll { overflow: visible; }
+      #fav-grid {
+        margin: 0 auto;
+        padding: 8px 4px 4px;
+        gap: 14px;
+        max-width: 100%;
+      }
+
+      #left-panel {
+        background: rgba(0, 0, 0, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 20px;
+        padding-bottom: 6px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      #alpha-book-scroll { overflow: visible; max-height: none; }
+
+      #add-form-container {
+        width: min(340px, calc(100vw - 20px));
+        right: 10px; left: auto; top: 58px;
+      }
+      .settings-popup {
+        min-width: min(320px, calc(100vw - 20px));
+        max-width: calc(100vw - 20px);
+        right: -6px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      #fav-grid { gap: 10px; }
+      .icon-card { width: 84px; padding: 14px 8px 12px; }
+      #add-btn { width: 60px; height: 60px; font-size: 26px; }
+    }
   </style>
 </head>
 <body>
 
 <!-- ─── Header ──────────────────────────────────────────────────────── -->
 <header id="app-header">
+  <nav id="category-bar" aria-label="Kategorien"></nav>
   <div class="header-brand">
     <div class="header-logo">🔖</div>
     <div>
@@ -840,6 +1102,10 @@
     <input type="text" id="input-url" placeholder="z.B. github.com" autocomplete="off" />
     <div class="form-error" id="form-error"></div>
   </div>
+  <div class="form-group" id="form-cat-group" style="display:none">
+    <label>Kategorien</label>
+    <div id="form-cat-list" class="form-cat-list"></div>
+  </div>
   <div class="form-actions">
     <button class="btn btn-secondary" id="form-cancel">Abbrechen</button>
     <button class="btn btn-primary"   id="form-save">Speichern</button>
@@ -902,6 +1168,10 @@
     <span id="ctx-fav-label">Zu Favoriten hinzufügen</span>
   </button>
   <div class="ctx-divider"></div>
+  <button class="ctx-item ctx-cat" id="ctx-cat" role="menuitem">
+    <span class="ctx-icon">🏷</span> Kategorien zuweisen
+  </button>
+  <div class="ctx-divider"></div>
   <button class="ctx-item ctx-danger" id="ctx-del" role="menuitem">
     <span class="ctx-icon">🗑</span> Entfernen
   </button>
@@ -929,21 +1199,40 @@
   </div>
 </div>
 
+<!-- ─── Category Modal ───────────────────────────────────────────────── -->
+<div id="cat-modal-overlay"></div>
+<div id="cat-modal" role="dialog" aria-modal="true" aria-label="Kategorien">
+  <div class="form-title" id="cat-modal-title">Kategorien verwalten</div>
+  <div id="cat-modal-bmname" style="display:none"></div>
+  <div id="cat-modal-list" class="cat-modal-list"></div>
+  <div class="cat-new-row">
+    <input type="text" id="cat-new-input" placeholder="Neue Kategorie…" autocomplete="off" aria-label="Neue Kategorie" />
+    <button class="btn btn-primary cat-new-add" id="cat-new-add">Anlegen</button>
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-secondary" id="cat-modal-close">Fertig</button>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════════════════════════════════════════════
 // WebFavs — Niagara-style Bookmark Manager
 // ══════════════════════════════════════════════════════════════════════
 
-const STORAGE_KEY = 'webfavs_bookmarks';
-const LETTERS     = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '#'];
+const STORAGE_KEY     = 'webfavs_bookmarks';
+const CAT_STORAGE_KEY = 'webfavs_categories';
+const LETTERS         = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '#'];
 
 // ── State ─────────────────────────────────────────────────────────────
-let bookmarks    = [];
-let lastDeleted  = null;
-let toastTimer   = null;
-let isFormOpen   = false;
-let searchQuery  = '';
-let ctxId        = null; // bookmark id for context menu
+let bookmarks      = [];
+let categories     = [];      // [{ id, name }]
+let activeCategory = null;    // category id, or null = "Alle"
+let lastDeleted    = null;
+let toastTimer     = null;
+let isFormOpen     = false;
+let searchQuery    = '';
+let ctxId          = null;    // bookmark id for context menu
+let formSelectedCats = new Set();
 
 // ── DOM ───────────────────────────────────────────────────────────────
 const alphaBookScroll  = document.getElementById('alpha-book-scroll');
@@ -968,6 +1257,17 @@ const ctxMenu          = document.getElementById('ctx-menu');
 const ctxBackdrop      = document.getElementById('ctx-backdrop');
 const leftSearchInput  = document.getElementById('left-search-input');
 const leftSearchClear  = document.getElementById('left-search-clear');
+const categoryBar      = document.getElementById('category-bar');
+const formCatGroup     = document.getElementById('form-cat-group');
+const formCatList      = document.getElementById('form-cat-list');
+const catModalOverlay  = document.getElementById('cat-modal-overlay');
+const catModal         = document.getElementById('cat-modal');
+const catModalTitle    = document.getElementById('cat-modal-title');
+const catModalBmName   = document.getElementById('cat-modal-bmname');
+const catModalList     = document.getElementById('cat-modal-list');
+const catNewInput      = document.getElementById('cat-new-input');
+const catNewAdd        = document.getElementById('cat-new-add');
+const catModalClose    = document.getElementById('cat-modal-close');
 
 // ══════════════════════════════════════════════════════════════════════
 // PERSISTENCE
@@ -977,8 +1277,11 @@ function loadBookmarks() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     bookmarks = raw ? JSON.parse(raw) : getDefaults();
-    // Migration: ensure favorite field exists
-    bookmarks.forEach(bm => { if (bm.favorite === undefined) bm.favorite = false; });
+    // Migration: ensure favorite + categories fields exist
+    bookmarks.forEach(bm => {
+      if (bm.favorite === undefined) bm.favorite = false;
+      if (!Array.isArray(bm.categories)) bm.categories = [];
+    });
   } catch { bookmarks = getDefaults(); }
 }
 
@@ -986,14 +1289,26 @@ function saveBookmarks() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
 }
 
+function loadCategories() {
+  try {
+    const raw = localStorage.getItem(CAT_STORAGE_KEY);
+    categories = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(categories)) categories = [];
+  } catch { categories = []; }
+}
+
+function saveCategories() {
+  localStorage.setItem(CAT_STORAGE_KEY, JSON.stringify(categories));
+}
+
 function getDefaults() {
   return [
-    { id: uid(), name: 'Adobe',    url: 'https://adobe.com',              favorite: false },
-    { id: uid(), name: 'Etsy',     url: 'https://etsy.com',               favorite: false },
-    { id: uid(), name: 'Fortnite', url: 'https://fortnite.com',           favorite: false },
-    { id: uid(), name: 'Gemini',   url: 'https://gemini.google.com',      favorite: true  },
-    { id: uid(), name: 'GitHub',   url: 'https://github.com',             favorite: true  },
-    { id: uid(), name: 'YouTube',  url: 'https://youtube.com',            favorite: true  },
+    { id: uid(), name: 'Adobe',    url: 'https://adobe.com',              favorite: false, categories: [] },
+    { id: uid(), name: 'Etsy',     url: 'https://etsy.com',               favorite: false, categories: [] },
+    { id: uid(), name: 'Fortnite', url: 'https://fortnite.com',           favorite: false, categories: [] },
+    { id: uid(), name: 'Gemini',   url: 'https://gemini.google.com',      favorite: true,  categories: [] },
+    { id: uid(), name: 'GitHub',   url: 'https://github.com',             favorite: true,  categories: [] },
+    { id: uid(), name: 'YouTube',  url: 'https://youtube.com',            favorite: true,  categories: [] },
   ];
 }
 
@@ -1033,12 +1348,21 @@ function groupByLetter(list) {
   return g;
 }
 
+function inActiveCategory(bm) {
+  if (!activeCategory) return true;
+  return Array.isArray(bm.categories) && bm.categories.includes(activeCategory);
+}
+
 function getFiltered() {
-  if (!searchQuery) return sorted(bookmarks);
-  const q = searchQuery.toLowerCase();
-  return sorted(bookmarks.filter(bm =>
-    bm.name.toLowerCase().includes(q) || bm.url.toLowerCase().includes(q)
-  ));
+  // Category filter applies first — other apps are fully hidden and unsearchable.
+  let list = bookmarks.filter(inActiveCategory);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(bm =>
+      bm.name.toLowerCase().includes(q) || bm.url.toLowerCase().includes(q)
+    );
+  }
+  return sorted(list);
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -1046,6 +1370,7 @@ function getFiltered() {
 // ══════════════════════════════════════════════════════════════════════
 
 function renderAll() {
+  renderCategoryBar();
   renderLeftPanel();
   renderFavorites();
   updateCounts();
@@ -1124,7 +1449,8 @@ function renderLeftPanel() {
 function renderFavorites() {
   favGrid.innerHTML = '';
   // Use the custom order of bookmarks array, do not sort alphabetically!
-  const favorites = bookmarks.filter(b => b.favorite);
+  // Respect the active category filter — favorites of other categories are hidden.
+  const favorites = bookmarks.filter(b => b.favorite && inActiveCategory(b));
 
   // Show empty state text if no favorites, but keep grid visible for the plus button
   favEmpty.style.display = favorites.length === 0 ? '' : 'none';
@@ -1239,6 +1565,7 @@ const ctxFavIcon  = document.getElementById('ctx-fav-icon');
 const ctxFavLabel = document.getElementById('ctx-fav-label');
 const ctxOpenBtn  = document.getElementById('ctx-open');
 const ctxDelBtn   = document.getElementById('ctx-del');
+const ctxCatBtn   = document.getElementById('ctx-cat');
 const ctxBmName   = document.getElementById('ctx-bm-name');
 
 function showCtxMenu(e, id) {
@@ -1264,7 +1591,7 @@ function showCtxMenu(e, id) {
   }
 
   // Smart position (avoid clipping at edges)
-  const MENU_W = 210, MENU_H = 160;
+  const MENU_W = 210, MENU_H = 210;
   let x = e.clientX, y = e.clientY;
   if (x + MENU_W > window.innerWidth  - 8) x = window.innerWidth  - MENU_W - 8;
   if (y + MENU_H > window.innerHeight - 8) y = window.innerHeight - MENU_H - 8;
@@ -1297,6 +1624,13 @@ ctxOpenBtn.addEventListener('click', () => {
   hideCtxMenu();
 });
 
+ctxCatBtn.addEventListener('click', () => {
+  if (!ctxId) return;
+  const id = ctxId;      // capture before hideCtxMenu clears it
+  hideCtxMenu();
+  openCatModal('assign', id);
+});
+
 ctxDelBtn.addEventListener('click', () => {
   if (!ctxId) return;
   const bm = bookmarks.find(b => b.id === ctxId);
@@ -1305,7 +1639,10 @@ ctxDelBtn.addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') hideCtxMenu();
+  if (e.key === 'Escape') {
+    hideCtxMenu();
+    if (catModal.classList.contains('visible')) closeCatModal();
+  }
 });
 
 // ══════════════════════════════════════════════════════════════════════
@@ -1355,6 +1692,197 @@ toastUndo.addEventListener('click', () => {
 });
 
 // ══════════════════════════════════════════════════════════════════════
+// CATEGORIES
+// ══════════════════════════════════════════════════════════════════════
+
+function renderCategoryBar() {
+  categoryBar.innerHTML = '';
+
+  categoryBar.appendChild(makeCatPill('Alle', null));
+  categories.forEach(cat => categoryBar.appendChild(makeCatPill(cat.name, cat.id)));
+
+  const addPill = document.createElement('button');
+  addPill.className = 'cat-pill cat-add';
+  addPill.textContent = '+';
+  addPill.title = 'Kategorie verwalten';
+  addPill.setAttribute('aria-label', 'Kategorie verwalten');
+  addPill.addEventListener('click', () => openCatModal('manage'));
+  categoryBar.appendChild(addPill);
+}
+
+function makeCatPill(label, id) {
+  const btn = document.createElement('button');
+  btn.className = 'cat-pill' + (activeCategory === id ? ' active' : '');
+  btn.textContent = label;
+  btn.addEventListener('click', () => setActiveCategory(id));
+  return btn;
+}
+
+function setActiveCategory(id) {
+  activeCategory = (activeCategory === id) ? null : id; // click active again → back to "Alle"
+  renderCategoryBar();
+  renderLeftPanel();
+  renderFavorites();
+}
+
+function addCategory(name) {
+  name = name.trim();
+  if (!name) return null;
+  const existing = categories.find(c => c.name.toLowerCase() === name.toLowerCase());
+  if (existing) return existing;
+  const cat = { id: uid(), name };
+  categories.push(cat);
+  saveCategories();
+  return cat;
+}
+
+function deleteCategory(id) {
+  categories = categories.filter(c => c.id !== id);
+  bookmarks.forEach(bm => {
+    if (Array.isArray(bm.categories)) bm.categories = bm.categories.filter(cid => cid !== id);
+  });
+  if (activeCategory === id) activeCategory = null;
+  saveCategories();
+  saveBookmarks();
+  renderAll();
+}
+
+function toggleBookmarkCategory(bmId, catId) {
+  const bm = bookmarks.find(b => b.id === bmId);
+  if (!bm) return;
+  if (!Array.isArray(bm.categories)) bm.categories = [];
+  const i = bm.categories.indexOf(catId);
+  if (i >= 0) bm.categories.splice(i, 1);
+  else bm.categories.push(catId);
+  saveBookmarks();
+}
+
+// ── Category Modal (manage / assign) ──────────────────────────────────
+let catModalMode = 'manage'; // 'manage' | 'assign'
+let catModalBmId = null;
+
+function openCatModal(mode, bmId = null) {
+  catModalMode = mode;
+  catModalBmId = bmId;
+  const bm = bmId ? bookmarks.find(b => b.id === bmId) : null;
+
+  catModalTitle.textContent = mode === 'assign' ? 'Kategorien zuweisen' : 'Kategorien verwalten';
+  if (bm) { catModalBmName.style.display = ''; catModalBmName.textContent = bm.name; }
+  else    { catModalBmName.style.display = 'none'; }
+
+  catNewInput.value = '';
+  renderCatModalList();
+  catModalOverlay.classList.add('visible');
+  catModal.classList.add('visible');
+  setTimeout(() => catNewInput.focus(), 60);
+}
+
+function closeCatModal() {
+  catModalOverlay.classList.remove('visible');
+  catModal.classList.remove('visible');
+  catModalBmId = null;
+}
+
+function renderCatModalList() {
+  catModalList.innerHTML = '';
+
+  if (categories.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'cat-empty';
+    empty.textContent = 'Noch keine Kategorien. Lege unten eine an.';
+    catModalList.appendChild(empty);
+    return;
+  }
+
+  const bm = catModalBmId ? bookmarks.find(b => b.id === catModalBmId) : null;
+
+  categories.forEach(cat => {
+    const row = document.createElement('div');
+    row.className = 'cat-row';
+
+    if (catModalMode === 'assign') {
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'cat-row-check';
+      cb.checked = !!(bm && Array.isArray(bm.categories) && bm.categories.includes(cat.id));
+      cb.addEventListener('change', () => {
+        toggleBookmarkCategory(catModalBmId, cat.id);
+        renderLeftPanel();
+        renderFavorites();
+      });
+      row.appendChild(cb);
+    }
+
+    const name = document.createElement('span');
+    name.className = 'cat-row-name';
+    name.textContent = cat.name;
+    row.appendChild(name);
+
+    const del = document.createElement('button');
+    del.className = 'cat-row-del';
+    del.textContent = '✕';
+    del.title = 'Kategorie löschen';
+    del.addEventListener('click', () => {
+      deleteCategory(cat.id);
+      renderCatModalList();
+    });
+    row.appendChild(del);
+
+    catModalList.appendChild(row);
+  });
+}
+
+function catModalAddNew() {
+  const name = catNewInput.value.trim();
+  if (!name) return;
+  const cat = addCategory(name);
+  if (catModalMode === 'assign' && catModalBmId && cat) {
+    const bm = bookmarks.find(b => b.id === catModalBmId);
+    if (bm) {
+      if (!Array.isArray(bm.categories)) bm.categories = [];
+      if (!bm.categories.includes(cat.id)) bm.categories.push(cat.id);
+      saveBookmarks();
+    }
+  }
+  catNewInput.value = '';
+  renderCatModalList();
+  renderCategoryBar();
+  renderLeftPanel();
+  renderFavorites();
+  catNewInput.focus();
+}
+
+catNewAdd.addEventListener('click', catModalAddNew);
+catNewInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); catModalAddNew(); }
+  if (e.key === 'Escape') closeCatModal();
+});
+catModalClose.addEventListener('click', closeCatModal);
+catModalOverlay.addEventListener('click', closeCatModal);
+
+// ── Category chips inside the add form ────────────────────────────────
+function renderFormCategories(preselect) {
+  formSelectedCats = new Set(preselect || []);
+  formCatGroup.style.display = categories.length ? '' : 'none';
+  formCatList.innerHTML = '';
+  categories.forEach(cat => {
+    const chip = document.createElement('span');
+    chip.className = 'form-cat-chip' + (formSelectedCats.has(cat.id) ? ' selected' : '');
+    chip.textContent = cat.name;
+    chip.addEventListener('click', () => {
+      if (formSelectedCats.has(cat.id)) {
+        formSelectedCats.delete(cat.id);
+        chip.classList.remove('selected');
+      } else {
+        formSelectedCats.add(cat.id);
+        chip.classList.add('selected');
+      }
+    });
+    formCatList.appendChild(chip);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════
 // ADD FORM
 // ══════════════════════════════════════════════════════════════════════
 
@@ -1364,7 +1892,12 @@ function toggleForm(open) {
   addFormOverlay.classList.toggle('visible', open);
   addFormContainer.classList.toggle('visible', open);
   formError.classList.remove('visible');
-  if (open) { inputName.value = ''; inputUrl.value = ''; setTimeout(() => inputName.focus(), 60); }
+  if (open) {
+    inputName.value = ''; inputUrl.value = '';
+    // Pre-select the active category so new bookmarks land where you're looking.
+    renderFormCategories(activeCategory ? [activeCategory] : []);
+    setTimeout(() => inputName.focus(), 60);
+  }
 }
 
 addBtn.addEventListener('click', () => toggleForm(!isFormOpen));
@@ -1396,7 +1929,9 @@ function saveNew() {
     showFormError('Diese URL ist bereits vorhanden.'); return;
   }
 
-  bookmarks.push({ id: uid(), name, url, favorite: false });
+  // Only keep categories that still exist.
+  const cats = [...formSelectedCats].filter(cid => categories.some(c => c.id === cid));
+  bookmarks.push({ id: uid(), name, url, favorite: false, categories: cats });
   bookmarks = sorted(bookmarks);
   saveBookmarks(); toggleForm(false); renderAll();
 }
@@ -1434,6 +1969,17 @@ document.addEventListener('keydown', e => {
 // ══════════════════════════════════════════════════════════════════════
 // THEME & INIT
 // ══════════════════════════════════════════════════════════════════════
+
+// Settings popup: tap-to-open on touch devices (hover handles desktop).
+const settingsContainer = document.querySelector('.settings-menu-container');
+const settingsGear      = document.querySelector('.settings-gear');
+const settingsPopup     = document.querySelector('.settings-popup');
+settingsGear.addEventListener('click', e => {
+  e.stopPropagation();
+  settingsContainer.classList.toggle('open');
+});
+settingsPopup.addEventListener('click', e => e.stopPropagation());
+document.addEventListener('click', () => settingsContainer.classList.remove('open'));
 
 const bgOptions = document.querySelectorAll('.bg-option');
 
@@ -1475,8 +2021,9 @@ const importConfirmBtn   = document.getElementById('import-confirm');
 
 function exportToFile() {
   const data = {
-    version: 1,
+    version: 2,
     bookmarks: bookmarks,
+    categories: categories,
     background: localStorage.getItem('webfavs_bg') || 'none'
   };
   const json = JSON.stringify(data, null, 2);
@@ -1492,8 +2039,9 @@ function exportToFile() {
 
 function copyShareLink() {
   const data = {
-    version: 1,
+    version: 2,
     bookmarks: bookmarks,
+    categories: categories,
     background: localStorage.getItem('webfavs_bg') || 'none'
   };
   const json = JSON.stringify(data);
@@ -1535,15 +2083,30 @@ function processImport(data) {
     return;
   }
   
+  // Restore categories first so bookmark references stay valid.
+  const importedCategories = Array.isArray(data.categories)
+    ? data.categories
+        .filter(c => c && c.id && c.name)
+        .map(c => ({ id: c.id, name: String(c.name) }))
+    : [];
+  const validCatIds = new Set(importedCategories.map(c => c.id));
+
   const importedBookmarks = data.bookmarks.map(bm => {
     return {
       id: bm.id || uid(),
       name: bm.name || 'Lesezeichen',
       url: bm.url || 'https://google.com',
-      favorite: !!bm.favorite
+      favorite: !!bm.favorite,
+      categories: Array.isArray(bm.categories)
+        ? bm.categories.filter(cid => validCatIds.has(cid))
+        : []
     };
   });
-  
+
+  categories = importedCategories;
+  activeCategory = null;
+  saveCategories();
+
   bookmarks = importedBookmarks;
   saveBookmarks();
   
@@ -1624,6 +2187,7 @@ importConfirmBtn.addEventListener('click', () => {
 });
 
 loadBackground();
+loadCategories();
 loadBookmarks();
 renderAll();
 checkUrlImport();
