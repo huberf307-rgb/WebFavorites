@@ -205,31 +205,33 @@
       padding: 6px 6px 6px;
     }
     .bg-image-preview {
-      height: 70px;
-      border-radius: 12px;
+      height: 74px;
+      border-radius: 14px;
       background-size: cover;
       background-position: center;
       cursor: pointer;
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      /* Thick frame hides the image edge bleeding past the title banner */
+      border: 3px solid rgba(28, 26, 24, 0.85);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
       transition: transform var(--transition), border-color var(--transition);
       display: flex;
       align-items: flex-end;
     }
     .bg-image-preview:hover {
       transform: scale(1.03);
-      border-color: var(--glass-border-strong);
+      border-color: var(--accent);
     }
     .bg-image-title {
       width: 100%;
       font-size: 0.65rem;
       font-weight: 600;
       color: #fff;
-      background: rgba(0,0,0,0.55);
+      background: rgba(0,0,0,0.6);
       padding: 4px 6px;
       text-align: center;
-      border-radius: 0 0 11px 11px;
+      border-radius: 0 0 9px 9px;
     }
 
     /* ─── Header ─────────────────────────────────────────────────────── */
@@ -809,6 +811,8 @@
       padding: 22px;
       box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
       display: none;
+      max-height: 88dvh;
+      overflow-y: auto;
       backdrop-filter: blur(32px) saturate(180%);
       -webkit-backdrop-filter: blur(32px) saturate(180%);
     }
@@ -859,14 +863,26 @@
       stroke-dasharray: 26; stroke-dashoffset: 26;
       transition: stroke-dashoffset 0.3s cubic-bezier(0.65, 0, 0.35, 1);
     }
-    .cat-row-toggle.selected .cat-check {
+    .cat-row-toggle.selected .cat-check,
+    .cat-app-row.selected .cat-check {
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       border-color: transparent;
       animation: checkPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .cat-row-toggle.selected .cat-check svg {
+    .cat-row-toggle.selected .cat-check svg,
+    .cat-app-row.selected .cat-check svg {
       stroke-dashoffset: 0;
       transition-delay: 0.06s;
+    }
+    /* Selectable app row (detail modal, "add apps" mode) */
+    .cat-app-row.selectable {
+      cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .cat-app-row.selectable:hover { background: rgba(255, 255, 255, 0.07); }
+    .cat-app-row.selectable:focus-visible { outline: none; border-color: var(--glass-border-strong); }
+    .cat-app-row.selected {
+      background: var(--accent-soft);
+      border-color: var(--border-accent);
     }
     @keyframes checkPop {
       0%   { transform: scale(0.7); }
@@ -903,6 +919,87 @@
     .cat-new-row input::placeholder { color: var(--text-muted); }
     .cat-new-add {
       flex: 0 0 auto; width: auto; padding: 9px 16px;
+    }
+    /* Manage mode: whole row opens the detail view */
+    .cat-row-open { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .cat-row-open:hover { background: rgba(255, 255, 255, 0.07); }
+    .cat-row-count {
+      font-size: 0.72rem; color: var(--text-muted); flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 8px; border-radius: 999px;
+    }
+
+    /* ─── Category Detail Modal ──────────────────────────────────────── */
+    #cat-detail-overlay {
+      position: fixed; inset: 0; z-index: 320;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      display: none;
+    }
+    #cat-detail-overlay.visible { display: block; }
+    #cat-detail {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 330;
+      width: min(400px, calc(100vw - 24px));
+      background: rgba(20, 20, 18, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      display: none;
+      max-height: 88dvh;
+      overflow-y: auto;
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+    }
+    #cat-detail.visible {
+      display: block;
+      animation: importModalIn var(--transition-slow) forwards;
+    }
+    .cat-detail-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; margin: 4px 0 9px;
+    }
+    #cat-detail-subtitle {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--text-muted);
+    }
+    .cat-detail-plus {
+      flex-shrink: 0;
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-primary);
+      font-size: 17px; line-height: 1; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform var(--transition), background var(--transition);
+    }
+    .cat-detail-plus:hover { background: rgba(255, 255, 255, 0.13); }
+    .cat-detail-plus.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #fff; transform: rotate(45deg);
+    }
+    .cat-detail-list {
+      display: flex; flex-direction: column; gap: 5px;
+      max-height: min(46vh, 340px); overflow-y: auto;
+      margin-bottom: 6px;
+    }
+    .cat-app-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 11px; border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .cat-app-row .cat-app-icon {
+      width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+      object-fit: contain; background: rgba(255, 255, 255, 0.9);
+    }
+    .cat-app-name {
+      flex: 1; min-width: 0; font-size: 0.85rem; color: var(--text-primary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
     /* ─── Category chips inside add form ─────────────────────────────── */
@@ -952,6 +1049,8 @@
       .icon-card { width: 108px; }
       .icon-favicon-wrap { width: 56px; height: 56px; }
       .icon-favicon-wrap img { width: 32px; height: 32px; }
+      .bg-image-preview { height: 86px; }
+      #cat-detail { width: min(460px, calc(100vw - 24px)); }
     }
     @media (min-width: 2100px) {
       #main-layout { max-width: 2000px; margin: 0 auto; width: 100%; }
@@ -1045,6 +1144,16 @@
         max-width: calc(100vw - 20px);
         right: -6px;
       }
+
+      /* Dialogs: tighter on small screens, list scrolls inside */
+      #cat-modal, #cat-detail {
+        padding: 18px;
+        border-radius: 20px;
+        max-height: 84dvh;
+      }
+      .cat-modal-list { max-height: 38vh; }
+      .cat-detail-list { max-height: 40vh; }
+      .bg-image-preview { height: 66px; }
     }
 
     @media (max-width: 420px) {
@@ -1093,31 +1202,31 @@
         <div class="settings-popup-label">Hintergrund – Bilder</div>
         <div class="bg-images-grid">
           <div class="bg-image-preview bg-option" data-bg="url('backgrounds/mountain_landscape_wide.png')" style="background-image: url('backgrounds/mountain_landscape_wide.png');">
-            <span class="bg-image-title">Berglandschaft Wide</span>
+            <span class="bg-image-title">Bergpanorama</span>
           </div>
           <div class="bg-image-preview bg-option" data-bg="url('backgrounds/desert_city_wide.png')" style="background-image: url('backgrounds/desert_city_wide.png');">
-            <span class="bg-image-title">Wüstenstadt</span>
+            <span class="bg-image-title">Goldene Stadt</span>
           </div>
           <div class="bg-image-preview bg-option" data-bg="url('backgrounds/anthropic_minimalist.png')" style="background-image: url('backgrounds/anthropic_minimalist.png');">
-            <span class="bg-image-title">Anthropic Post</span>
+            <span class="bg-image-title">Terrakotta-Wellen</span>
           </div>
           <div class="bg-image-preview bg-option" data-bg="url('backgrounds/desert_dunes_nature.png')" style="background-image: url('backgrounds/desert_dunes_nature.png');">
-            <span class="bg-image-title">Wüstendünen (Natur)</span>
+            <span class="bg-image-title">Goldene Dünen</span>
           </div>
           <div class="bg-image-preview bg-option" data-bg="url('backgrounds/watercolor_misty_hills.png')" style="background-image: url('backgrounds/watercolor_misty_hills.png');">
-            <span class="bg-image-title">Aquarell-Berge</span>
+            <span class="bg-image-title">Nebelhügel</span>
           </div>
           <div class="bg-image-preview bg-option" data-bg="url('backgrounds/2_gradient_waves.png')" style="background-image: url('backgrounds/2_gradient_waves.png');">
-            <span class="bg-image-title">Farbwellen</span>
+            <span class="bg-image-title">Seidenwellen</span>
           </div>
           <div class="bg-image-preview bg-option" data-bg="url('backgrounds/3_watercolor_forest.png')" style="background-image: url('backgrounds/3_watercolor_forest.png');">
-            <span class="bg-image-title">Aquarell-Wald</span>
+            <span class="bg-image-title">Nebelwald</span>
           </div>
           <div class="bg-image-preview bg-option" data-bg="url('backgrounds/4_geometric_shapes.png')" style="background-image: url('backgrounds/4_geometric_shapes.png');">
-            <span class="bg-image-title">Geometrie</span>
+            <span class="bg-image-title">Glasperlen</span>
           </div>
           <div class="bg-image-preview bg-option" data-bg="url('backgrounds/5_dreamy_clouds.png')" style="background-image: url('backgrounds/5_dreamy_clouds.png');">
-            <span class="bg-image-title">Traumwolken</span>
+            <span class="bg-image-title">Wolkentraum</span>
           </div>
         </div>
 
@@ -1265,6 +1374,24 @@
   </div>
 </div>
 
+<!-- ─── Category Detail Modal (rename + assign apps) ─────────────────── -->
+<div id="cat-detail-overlay"></div>
+<div id="cat-detail" role="dialog" aria-modal="true" aria-label="Kategorie bearbeiten">
+  <div class="form-title">Kategorie bearbeiten</div>
+  <div class="form-group">
+    <label for="cat-detail-name">Name</label>
+    <input type="text" id="cat-detail-name" autocomplete="off" placeholder="Kategoriename" />
+  </div>
+  <div class="cat-detail-head">
+    <span id="cat-detail-subtitle">Apps in dieser Kategorie</span>
+    <button id="cat-detail-toggle" class="cat-detail-plus" aria-label="Apps hinzufügen">+</button>
+  </div>
+  <div id="cat-detail-list" class="cat-detail-list"></div>
+  <div class="form-actions">
+    <button class="btn btn-secondary" id="cat-detail-close">Fertig</button>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════════════════════════════════════════════
 // WebFavs — Niagara-style Bookmark Manager
@@ -1319,6 +1446,13 @@ const catModalList     = document.getElementById('cat-modal-list');
 const catNewInput      = document.getElementById('cat-new-input');
 const catNewAdd        = document.getElementById('cat-new-add');
 const catModalClose    = document.getElementById('cat-modal-close');
+const catDetailOverlay = document.getElementById('cat-detail-overlay');
+const catDetail        = document.getElementById('cat-detail');
+const catDetailName    = document.getElementById('cat-detail-name');
+const catDetailSubtitle= document.getElementById('cat-detail-subtitle');
+const catDetailToggle  = document.getElementById('cat-detail-toggle');
+const catDetailList    = document.getElementById('cat-detail-list');
+const catDetailClose   = document.getElementById('cat-detail-close');
 
 // ══════════════════════════════════════════════════════════════════════
 // PERSISTENCE
@@ -1692,7 +1826,9 @@ ctxDelBtn.addEventListener('click', () => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     hideCtxMenu();
-    if (catModal.classList.contains('visible')) closeCatModal();
+    // Close the topmost dialog first
+    if (catDetail.classList.contains('visible')) closeCatDetail();
+    else if (catModal.classList.contains('visible')) closeCatModal();
   }
 });
 
@@ -1883,6 +2019,25 @@ function renderCatModalList() {
     name.textContent = cat.name;
     row.appendChild(name);
 
+    // Manage mode: the row opens the detail view (rename + assign apps)
+    if (catModalMode === 'manage') {
+      row.classList.add('cat-row-open');
+      row.tabIndex = 0;
+      row.title = 'Bearbeiten';
+
+      const count = document.createElement('span');
+      count.className = 'cat-row-count';
+      count.textContent = bookmarks.filter(b =>
+        Array.isArray(b.categories) && b.categories.includes(cat.id)).length;
+      row.appendChild(count);
+
+      const open = () => openCatDetail(cat.id);
+      row.addEventListener('click', open);
+      row.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+      });
+    }
+
     const del = document.createElement('button');
     del.className = 'cat-row-del';
     del.textContent = '✕';
@@ -1918,6 +2073,172 @@ function catModalAddNew() {
   renderFavorites();
   catNewInput.focus();
 }
+
+// ── Category Detail: rename + bulk-assign apps ────────────────────────
+let catDetailId      = null;
+let catDetailAddMode = false;
+
+function openCatDetail(catId) {
+  const cat = categories.find(c => c.id === catId);
+  if (!cat) return;
+  catDetailId = catId;
+  catDetailAddMode = false;
+  catDetailName.value = cat.name;
+  renderCatDetail();
+  catDetailOverlay.classList.add('visible');
+  catDetail.classList.add('visible');
+}
+
+function closeCatDetail() {
+  commitCatRename();
+  catDetailOverlay.classList.remove('visible');
+  catDetail.classList.remove('visible');
+  catDetailId = null;
+  // Reflect renames / membership changes in the list behind it
+  renderCatModalList();
+  renderAll();
+}
+
+function commitCatRename() {
+  const cat = categories.find(c => c.id === catDetailId);
+  if (!cat) return;
+  const newName = catDetailName.value.trim();
+  if (newName && newName !== cat.name) {
+    cat.name = newName;
+    saveCategories();
+    renderCategoryBar();
+  } else if (!newName) {
+    catDetailName.value = cat.name; // never allow an empty name
+  }
+}
+
+function setCatDetailMode(addMode) {
+  catDetailAddMode = addMode;
+  renderCatDetail();
+}
+
+function renderCatDetail() {
+  const cat = categories.find(c => c.id === catDetailId);
+  if (!cat) return;
+
+  catDetailToggle.classList.toggle('active', catDetailAddMode);
+  catDetailToggle.setAttribute('aria-label',
+    catDetailAddMode ? 'Fertig mit Hinzufügen' : 'Apps hinzufügen');
+  catDetailSubtitle.textContent = catDetailAddMode
+    ? 'Apps auswählen'
+    : 'Apps in dieser Kategorie';
+
+  catDetailList.innerHTML = '';
+
+  // In add mode show every app; otherwise only the members — both alphabetical.
+  const list = catDetailAddMode
+    ? sorted(bookmarks)
+    : sorted(bookmarks.filter(b =>
+        Array.isArray(b.categories) && b.categories.includes(cat.id)));
+
+  if (list.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'cat-empty';
+    empty.textContent = catDetailAddMode
+      ? 'Noch keine Apps vorhanden.'
+      : 'Noch keine Apps in dieser Kategorie. Tippe auf +, um welche hinzuzufügen.';
+    catDetailList.appendChild(empty);
+    return;
+  }
+
+  list.forEach(bm => {
+    const inCat = Array.isArray(bm.categories) && bm.categories.includes(cat.id);
+    const row = document.createElement('div');
+    row.className = 'cat-app-row';
+
+    if (catDetailAddMode) {
+      row.classList.add('selectable');
+      if (inCat) row.classList.add('selected');
+      row.setAttribute('role', 'checkbox');
+      row.setAttribute('aria-checked', inCat ? 'true' : 'false');
+      row.tabIndex = 0;
+
+      const check = document.createElement('span');
+      check.className = 'cat-check';
+      check.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4 4L19 7"/></svg>';
+      row.appendChild(check);
+    }
+
+    row.appendChild(makeAppIcon(bm));
+
+    const name = document.createElement('span');
+    name.className = 'cat-app-name';
+    name.textContent = bm.name;
+    row.appendChild(name);
+
+    if (catDetailAddMode) {
+      const toggle = () => {
+        toggleBookmarkCategory(bm.id, cat.id);
+        const now = bm.categories.includes(cat.id);
+        row.classList.toggle('selected', now);
+        row.setAttribute('aria-checked', now ? 'true' : 'false');
+        renderLeftPanel();
+        renderFavorites();
+      };
+      row.addEventListener('click', toggle);
+      row.addEventListener('keydown', e => {
+        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); }
+      });
+    } else {
+      // Member list: throw the app out of this category
+      const del = document.createElement('button');
+      del.className = 'cat-row-del';
+      del.textContent = '✕';
+      del.title = 'Aus Kategorie entfernen';
+      del.setAttribute('aria-label', `${bm.name} aus Kategorie entfernen`);
+      del.addEventListener('click', e => {
+        e.stopPropagation();
+        toggleBookmarkCategory(bm.id, cat.id);
+        renderCatDetail();
+        renderLeftPanel();
+        renderFavorites();
+      });
+      row.appendChild(del);
+    }
+
+    catDetailList.appendChild(row);
+  });
+}
+
+function makeAppIcon(bm) {
+  const favUrl = getFaviconUrl(bm.url);
+  if (favUrl) {
+    const img = document.createElement('img');
+    img.className = 'cat-app-icon';
+    img.src = favUrl; img.alt = ''; img.loading = 'lazy';
+    img.onerror = () => {
+      const ph = document.createElement('span');
+      ph.className = 'cat-app-icon';
+      ph.style.cssText =
+        'display:flex;align-items:center;justify-content:center;font-size:11px;' +
+        'font-weight:700;color:#1c1a18;';
+      ph.textContent = (bm.name[0] || '?').toUpperCase();
+      img.replaceWith(ph);
+    };
+    return img;
+  }
+  const ph = document.createElement('span');
+  ph.className = 'cat-app-icon';
+  ph.style.cssText =
+    'display:flex;align-items:center;justify-content:center;font-size:11px;' +
+    'font-weight:700;color:#1c1a18;';
+  ph.textContent = (bm.name[0] || '?').toUpperCase();
+  return ph;
+}
+
+catDetailToggle.addEventListener('click', () => setCatDetailMode(!catDetailAddMode));
+catDetailClose.addEventListener('click', closeCatDetail);
+catDetailOverlay.addEventListener('click', closeCatDetail);
+catDetailName.addEventListener('change', commitCatRename);
+catDetailName.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); commitCatRename(); catDetailName.blur(); }
+  if (e.key === 'Escape') closeCatDetail();
+});
 
 catNewAdd.addEventListener('click', catModalAddNew);
 catNewInput.addEventListener('keydown', e => {
